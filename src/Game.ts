@@ -20,7 +20,7 @@ export class Game {
       height: 50,
       stateTwo: {
         label: 'Stop',
-        backgroundColor: 0xFF0000,
+        backgroundColor: 0xe74c3c,
         textColor: 0xFFFFFF
       },
       initialState: "STATE_TWO"

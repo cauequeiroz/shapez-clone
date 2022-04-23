@@ -1,14 +1,14 @@
 import { Graphics, DisplayObject } from 'pixi.js';
 
 const TileColors: Record<number, number> = {
-  0: 0xFFFFFF,
-  1: 0xFF0000
+  0: 0xecf0f1,
+  1: 0xe74c3c
 }
 
 export class Tile {
   private value: number;
   private size: number;
-
+  private isHighlighted: boolean = false;
   private element!: Graphics;
 
   constructor(value: number, size: number) {
@@ -23,12 +23,17 @@ export class Tile {
     this.drawElement();    
   }
 
-  private drawElement() {
+  private drawElement(highlighted: boolean = false) {
     this.element.clear();
     this.element.beginFill(TileColors[this.value]);
-    this.element.lineStyle(2, 0x000000);
+    this.element.lineStyle(1, 0x34495e);
     this.element.drawRect(0, 0, this.size, this.size);
     this.element.endFill();
+
+    if (highlighted) {
+      this.element.lineStyle(10, 0x2c3e50, 0.3);
+      this.element.drawRoundedRect(10, 10, this.size - 20, this.size - 20, 5);
+    }
   }
 
   public getElement(): DisplayObject {
@@ -38,5 +43,17 @@ export class Tile {
   public toggleValue() {
     this.value = Number(!this.value);
     this.drawElement();
+  }
+
+  public highlight() {
+    if (this.isHighlighted) return;
+
+    this.isHighlighted = true;
+    this.drawElement(true);
+  }
+
+  public removeHighlight() {
+    this.isHighlighted = false;
+    this.drawElement(false);
   }
 }

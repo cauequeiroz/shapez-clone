@@ -81,7 +81,7 @@ export class Button {
   protected drawBackground() {
     this.backgroundElement.clear();
     this.backgroundElement.beginFill(this.backgroundColor);
-    this.backgroundElement.drawRect(0, 0, this.width, this.height);
+    this.backgroundElement.drawRoundedRect(0, 0, this.width, this.height, 10);
     this.backgroundElement.endFill();
   } 
 }

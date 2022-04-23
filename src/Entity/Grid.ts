@@ -14,18 +14,9 @@ export class Grid {
     this.verticalSize = verticalSize;
     this.horizontalSize = horizontalSize;
     this.tiles = this.createTiles();
-    console.log(this.tiles)
 
     this.createElement();
-    this.container.interactive = true;
-    this.container.on('pointerdown', (event: InteractionEvent) => {
-      const coord = event.data.getLocalPosition(this.container);
-      
-      const posY = Math.ceil((coord.y / Grid.tileSize) - 1);
-      const posX = Math.ceil((coord.x / Grid.tileSize) - 1);
-
-      this.tiles[posY][posX].toggleValue();
-    }, this);
+    this.setupEventListeners();
   }
 
   private createTiles() {
@@ -54,6 +45,44 @@ export class Grid {
         this.container.addChild(tileItem);
       });
     });
+  }
+
+  private setupEventListeners() {
+    this.container.interactive = true;
+
+    this.container.on('click', (event: InteractionEvent) => {
+      const coord = event.data.getLocalPosition(this.container);
+      
+      const posY = Math.ceil((coord.y / Grid.tileSize) - 1);
+      const posX = Math.ceil((coord.x / Grid.tileSize) - 1);
+
+      this.tiles[posY][posX].toggleValue();
+    }, this);
+
+    
+    let lastHighlightedTile: Tile;
+
+    this.container.on('mousemove', (event: InteractionEvent) => {
+      const coord = event.data.getLocalPosition(this.container);
+      
+      const posY = Math.ceil((coord.y / Grid.tileSize) - 1);
+      const posX = Math.ceil((coord.x / Grid.tileSize) - 1);
+      
+      const tile = this.tiles[posY] && this.tiles[posY][posX];
+      if (!tile) return;
+
+      if (!lastHighlightedTile) {
+        lastHighlightedTile = tile;
+        tile.highlight();
+        return;
+      }
+
+      if (tile !== lastHighlightedTile) {
+        lastHighlightedTile.removeHighlight();
+        lastHighlightedTile = tile;
+        tile.highlight();
+      } 
+    }, this);
   }
 
   public getElement(): DisplayObject {

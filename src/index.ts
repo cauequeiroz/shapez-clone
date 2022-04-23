@@ -8,7 +8,8 @@ const application = new Application({
 	autoDensity: true,
 	backgroundColor: settings.backgroundColor,
 	width: settings.width,
-	height: settings.height
+	height: settings.height,
+  antialias: true
 });
 
 new Game(application);
