@@ -1,6 +1,7 @@
 import { Application } from "pixi.js";
 import { SwitchButton } from "./UI/SwitchButton";
 import { Grid } from "./Entity/Grid";
+import { ToolBox } from "./Entity/ToolBox";
 
 export class Game {
   private application: Application;
@@ -15,7 +16,7 @@ export class Game {
       backgroundColor: 0x1abc9c,
       textColor: 0x2c3e50,
       xPosition: 15,
-      yPosition: 15,
+      yPosition: application.screen.height - 65,
       width: 100,
       height: 50,
       stateTwo: {
@@ -29,11 +30,18 @@ export class Game {
 
     // Grid
     const grid = new Grid(9, 10).getElement();
-    grid.y = 80;
+
+    // Tools
+    const toolBox = new ToolBox();
+    const toolBoxElement = toolBox.getElement();
+    
+    toolBoxElement.y = application.screen.height - toolBoxElement.height;
+
     
     // Add entities
     this.application.stage.addChild(grid);
     this.application.stage.addChild(switchButton.getElement());
+    this.application.stage.addChild(toolBoxElement);
 
     // Game Loop
     this.application.ticker.add(this.update, this);
