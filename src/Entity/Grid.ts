@@ -1,7 +1,9 @@
-import { Container, DisplayObject, InteractionEvent } from 'pixi.js';
+import { Container, DisplayObject, InteractionEvent, Point } from 'pixi.js';
+import { CoreMechanics } from './CoreMechanics';
 import { Tile } from './Tile';
 
 export class Grid {
+  private coreMechanics: CoreMechanics;
   static tileSize = 80;
 
   private verticalSize: number;
@@ -11,6 +13,7 @@ export class Grid {
   private tiles: Tile[][];
 
   constructor(verticalSize: number, horizontalSize: number) {
+    this.coreMechanics = CoreMechanics.getInstance();
     this.verticalSize = verticalSize;
     this.horizontalSize = horizontalSize;
     this.tiles = this.createTiles();
@@ -25,7 +28,7 @@ export class Grid {
     for (let y = 0; y < this.verticalSize; y++) {
       const line = [];
       for (let x = 0; x < this.horizontalSize; x++ ) {
-        line.push(new Tile(Math.random() <= .5 ? 1 : 0, Grid.tileSize));
+        line.push(new Tile(4, Grid.tileSize));
       }
       tiles.push(line);
     }
@@ -47,42 +50,49 @@ export class Grid {
     });
   }
 
+  private getActiveTool(): number {
+    return this.coreMechanics.mechanics.toolbox?.getActiveTool().getType();
+  }
+
   private setupEventListeners() {
     this.container.interactive = true;
 
     this.container.on('click', (event: InteractionEvent) => {
       const coord = event.data.getLocalPosition(this.container);
-      
-      const posY = Math.ceil((coord.y / Grid.tileSize) - 1);
-      const posX = Math.ceil((coord.x / Grid.tileSize) - 1);
+      const tile = this.getTileByCoords(coord);
 
-      this.tiles[posY][posX].toggleValue();
+      const activeTool = this.getActiveTool();
+      tile.setValue(activeTool);
     }, this);
 
     
     let lastHighlightedTile: Tile;
-
     this.container.on('mousemove', (event: InteractionEvent) => {
+      const activeTool = this.getActiveTool();
       const coord = event.data.getLocalPosition(this.container);
+      const tile = this.getTileByCoords(coord);
       
-      const posY = Math.ceil((coord.y / Grid.tileSize) - 1);
-      const posX = Math.ceil((coord.x / Grid.tileSize) - 1);
-      
-      const tile = this.tiles[posY] && this.tiles[posY][posX];
       if (!tile) return;
 
       if (!lastHighlightedTile) {
         lastHighlightedTile = tile;
-        tile.highlight();
+        tile.highlight(activeTool);
         return;
       }
 
       if (tile !== lastHighlightedTile) {
         lastHighlightedTile.removeHighlight();
         lastHighlightedTile = tile;
-        tile.highlight();
+        tile.highlight(activeTool);
       } 
     }, this);
+  }
+
+  private getTileByCoords(coord: Point): Tile {
+    const posY = Math.ceil((coord.y / Grid.tileSize) - 1);
+    const posX = Math.ceil((coord.x / Grid.tileSize) - 1);
+
+    return this.tiles[posY] && this.tiles[posY][posX];
   }
 
   public getElement(): DisplayObject {
