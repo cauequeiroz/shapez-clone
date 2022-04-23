@@ -7,6 +7,8 @@ export class ToolBox {
   private tools: Tool[];
   private activeTool!: Tool;
   private activeToolText!: Text;
+  private rotateAngleText!: Text;
+  private rotateAngle: number;
   private element!: Container;
 
   constructor() {
@@ -14,10 +16,20 @@ export class ToolBox {
       new Tool(TOOL_TYPE.BELT_1WAY),
       new Tool(TOOL_TYPE.BELT_2WAY),
       new Tool(TOOL_TYPE.BELT_3WAY),
-      new Tool(TOOL_TYPE.BELT_4WAY)
+      new Tool(TOOL_TYPE.BELT_4WAY),
     ];
     this.activeTool = this.tools[0];
+    this.rotateAngle = 0;
     this.createElement();
+    this.setupEvents();
+  }
+
+  private setupEvents() {
+    document.addEventListener("keyup", (event: KeyboardEvent) => {
+      if (event.key == 'r') {
+        this.rotateRight();
+      }
+    });
   }
 
   private handleClickTool(tool: Tool) {
@@ -35,6 +47,7 @@ export class ToolBox {
     
     container.addChild(background);
 
+    // Active tool text
     const textStyle = new TextStyle({
       fontFamily: "Courier New",
       fontSize: 20,
@@ -43,6 +56,12 @@ export class ToolBox {
     const activeToolText = new Text(String(this.activeTool.getType()), textStyle);
     this.activeToolText = activeToolText;
     container.addChild(activeToolText);
+
+    // Rotate angle
+    const rotateAngleText = new Text(String(this.rotateAngle), textStyle);
+    rotateAngleText.x = 500;
+    this.rotateAngleText = rotateAngleText;
+    container.addChild(rotateAngleText);
 
     this.tools.forEach((tool, index) => {
       const button = new Button({
@@ -64,5 +83,14 @@ export class ToolBox {
 
   public getActiveTool(): Tool {
     return this.activeTool;
+  }
+
+  public getRotateAngle(): number {
+    return this.rotateAngle;
+  }
+
+  public rotateRight() {    
+    this.rotateAngle = this.rotateAngle >= 270 ? 0 : this.rotateAngle + 90;
+    this.rotateAngleText.text = String(this.rotateAngle);
   }
 }

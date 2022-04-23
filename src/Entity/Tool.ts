@@ -1,8 +1,8 @@
 export enum TOOL_TYPE {
-  BELT_1WAY = 0,
-  BELT_2WAY = 1,
-  BELT_3WAY = 2,
-  BELT_4WAY = 3
+  BELT_1WAY = 1,
+  BELT_2WAY = 2,
+  BELT_3WAY = 3,
+  BELT_4WAY = 4,
 }
 
 export class Tool {

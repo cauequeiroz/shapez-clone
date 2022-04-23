@@ -28,7 +28,7 @@ export class Grid {
     for (let y = 0; y < this.verticalSize; y++) {
       const line = [];
       for (let x = 0; x < this.horizontalSize; x++ ) {
-        line.push(new Tile(4, Grid.tileSize));
+        line.push(new Tile(0, Grid.tileSize));
       }
       tiles.push(line);
     }
