@@ -1,5 +1,6 @@
 import { Application } from "pixi.js";
-import { SwitchButton } from "./Entity/SwitchButton";
+import { SwitchButton } from "./UI/SwitchButton";
+import { Grid } from "./Entity/Grid";
 
 export class Game {
   private application: Application;
@@ -13,8 +14,8 @@ export class Game {
       label: 'Start',
       backgroundColor: 0x1abc9c,
       textColor: 0x2c3e50,
-      xPosition: 10,
-      yPosition: 10,
+      xPosition: 15,
+      yPosition: 15,
       width: 100,
       height: 50,
       stateTwo: {
@@ -25,8 +26,13 @@ export class Game {
       initialState: "STATE_TWO"
     });
     switchButton.setClickEvent(this.handleButtonClick, this);
+
+    // Grid
+    const grid = new Grid(9, 10).getElement();
+    grid.y = 80;
     
     // Add entities
+    this.application.stage.addChild(grid);
     this.application.stage.addChild(switchButton.getElement());
 
     // Game Loop
