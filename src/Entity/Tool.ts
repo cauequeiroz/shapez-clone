@@ -1,4 +1,5 @@
 export enum TOOL_TYPE {
+  EMPTY = 0,
   BELT_1WAY = 1,
   BELT_2WAY = 2,
   BELT_3WAY = 3,

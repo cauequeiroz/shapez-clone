@@ -14,6 +14,7 @@ export class Tile {
 
   private value: number;
   private size: number;
+  private rotationAngle: number;
   private isHighlighted: boolean = false;
   private highlightValue!: number;
   private element!: Container;
@@ -22,16 +23,17 @@ export class Tile {
     this.coreMechanics = CoreMechanics.getInstance();
     this.value = value;
     this.size = size;
+    this.rotationAngle = 0;
 
     this.createElement();
   }
 
   private createElement() {
     this.element = new Container();
-    this.drawElement();    
+    this.drawBaseLayer();    
   }
 
-  private drawElement(highlighted: boolean = false) {
+  private drawBaseLayer() {
     if (this.element.children[0]) {
       this.element.children[0].destroy();
     }
@@ -41,6 +43,10 @@ export class Tile {
     const sprite = Sprite.from(TileTextures[this.value]);
     sprite.width = this.size;
     sprite.height = this.size;
+    sprite.x = this.size / 2;
+    sprite.y = this.size / 2;
+    sprite.anchor.set(0.5);
+    sprite.angle = this.rotationAngle;
 
     const spriteBorder = new Graphics();
     spriteBorder.lineStyle(1, 0x636e72, 0.2);
@@ -48,53 +54,74 @@ export class Tile {
 
     spriteContainer.addChild(sprite);
     spriteContainer.addChild(spriteBorder);
-    
-    if (highlighted) {
-      sprite.texture = TileTextures[this.highlightValue];
-      
-      const highlightedBorder = new Graphics();
-      highlightedBorder.lineStyle(4, 0xFFFFFF, 0.2);
-      highlightedBorder.drawRect(0, 0, this.size - 4, this.size - 4);
-      highlightedBorder.x = 2;
-      highlightedBorder.y = 2;
 
-      const rotateAngle = this.coreMechanics.mechanics.toolbox.getRotateAngle();
-      sprite.x = this.size / 2;
-      sprite.y = this.size / 2;
-      sprite.anchor.set(0.5);
-      sprite.angle = rotateAngle;
+    this.element.addChild(spriteContainer);
+  }
 
-      spriteContainer.addChild(highlightedBorder);
+  private drawHighlightLayer() {
+    if (this.element.children[0]) {
+      this.element.children[0].destroy();
     }
     
-    this.element.addChild(spriteContainer);
+    const highlightContainer = new Container();
+    
+    // TODO: Refactor this part to remove Grid control of Tile content
+    // Tile must be able to access toolbox to get what it needs.
+    const highlightValue = this.coreMechanics.mechanics.toolbox.getActiveTool().getType();
+
+    const sprite = Sprite.from(TileTextures[highlightValue]);
+    sprite.width = this.size;
+    sprite.height = this.size;
+    sprite.x = this.size / 2;
+    sprite.y = this.size / 2;
+    sprite.anchor.set(0.5);
+    sprite.angle = this.coreMechanics.mechanics.toolbox.getRotateAngle();
+
+    const highlightedBorder = new Graphics();
+    highlightedBorder.lineStyle(4, 0xFFFFFF, 0.2);
+    highlightedBorder.drawRect(0, 0, this.size - 4, this.size - 4);
+    highlightedBorder.x = 2;
+    highlightedBorder.y = 2;
+
+    highlightContainer.addChild(sprite);
+    highlightContainer.addChild(highlightedBorder);
+
+    this.element.addChild(highlightContainer);
   }
 
   public getElement(): DisplayObject {
     return this.element;
   }
 
-  public toggleValue() {
-    this.value = Number(!this.value);
-    this.drawElement();
+  public update() {
+    if (this.isHighlighted) {
+      this.drawHighlightLayer();
+    }
   }
 
-  public setValue(value: number) {
-    if (this.value == value) return;
+  public setValue() {
+    const rotationAngle = this.coreMechanics.mechanics.toolbox.getRotateAngle();
+    const value = this.coreMechanics.mechanics.toolbox.getActiveTool().getType();
+
+    if (this.value == value && this.rotationAngle == rotationAngle) return;
+
     this.value = value;
-    this.drawElement();
+    this.rotationAngle = rotationAngle;
+    this.drawBaseLayer();
   }
 
+  // TODO: Refactor this part to remove Grid control of Tile content
+  // Tile must be able to access toolbox to get this value.
   public highlight(value: number) {
     if (this.isHighlighted) return;
 
     this.isHighlighted = true;
     this.highlightValue = value;
-    this.drawElement(true);
+    this.drawHighlightLayer();
   }
 
   public removeHighlight() {
     this.isHighlighted = false;
-    this.drawElement(false);
+    this.drawBaseLayer();
   }
 }

@@ -11,6 +11,7 @@ export class Grid {
 
   private container!: Container;
   private tiles: Tile[][];
+  private activeTile!: Tile;
 
   constructor(verticalSize: number, horizontalSize: number) {
     this.coreMechanics = CoreMechanics.getInstance();
@@ -61,12 +62,10 @@ export class Grid {
       const coord = event.data.getLocalPosition(this.container);
       const tile = this.getTileByCoords(coord);
 
-      const activeTool = this.getActiveTool();
-      tile.setValue(activeTool);
+      tile.setValue();
     }, this);
 
     
-    let lastHighlightedTile: Tile;
     this.container.on('mousemove', (event: InteractionEvent) => {
       const activeTool = this.getActiveTool();
       const coord = event.data.getLocalPosition(this.container);
@@ -74,15 +73,15 @@ export class Grid {
       
       if (!tile) return;
 
-      if (!lastHighlightedTile) {
-        lastHighlightedTile = tile;
+      if (!this.activeTile) {
+        this.activeTile = tile;
         tile.highlight(activeTool);
         return;
       }
 
-      if (tile !== lastHighlightedTile) {
-        lastHighlightedTile.removeHighlight();
-        lastHighlightedTile = tile;
+      if (tile !== this.activeTile) {
+        this.activeTile.removeHighlight();
+        this.activeTile = tile;
         tile.highlight(activeTool);
       } 
     }, this);
@@ -97,5 +96,9 @@ export class Grid {
 
   public getElement(): DisplayObject {
     return this.container;
+  }
+
+  public updateTile() {
+    this.activeTile.update();
   }
 }
